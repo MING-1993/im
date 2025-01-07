@@ -1,0 +1,12 @@
+node_modules/
+dist/
+out/
+build/
+*.node
+*.tgz
+.DS_Store
+*.log
+*.env
+*.asar
+.idea
+.vscode
