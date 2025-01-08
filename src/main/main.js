@@ -1,5 +1,7 @@
 const { app, BrowserWindow, ipcMain, session, dialog } = require('electron');
 const path = require('node:path');
+const { autoUpdater } = require('electron-updater');
+require('dotenv').config();
 
 let mainWindow;
 let loginState = null;
@@ -62,6 +64,22 @@ app.whenReady().then(() => {
       app.quit()
     }
   })
+
+  // 启动自动更新
+  autoUpdater.checkForUpdatesAndNotify();
+
+  // 监听更新事件
+  autoUpdater.on('update-available', () => {
+    mainWindow.webContents.send('update-available');
+  });
+  autoUpdater.on('update-downloaded', () => {
+    mainWindow.webContents.send('update-downloaded');
+  });
+
+  // 触发安装更新
+  ipcMain.on('install-update', () => {
+    autoUpdater.quitAndInstall();
+  });
 
   // 保存登录状态
   ipcMain.on('set-login-state', (event, state) => {

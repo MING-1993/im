@@ -1,12 +1,13 @@
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+require('dotenv').config();
 
 module.exports = {
   packagerConfig: {
     asar: true,
     extendInfo: {
-      CFBundleName: "薇信",
-      CFBundleDisplayName: "薇信"
+      CFBundleName: "企业火",
+      CFBundleDisplayName: "企业火"
     }
   },
   rebuildConfig: {},
@@ -30,13 +31,25 @@ module.exports = {
     {
       name: '@electron-forge/maker-dmg',
       config: {
-        title: '薇信',
+        title: '企业火',
         icon: 'path/to/icon.icns',
         background: 'path/to/asset.png',
         format: "UDBZ",
         size: "1000m",
       },
     },
+  ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'MING-1993',
+          name: 'im',
+        },
+        prerelease: false,  // 设置为 true 用于发布预发行版本
+      }
+    }
   ],
   plugins: [
     {

@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, computed, ref } from 'vue';
+import { ElNotification } from "element-plus";
 import 'element-plus/es/components/notification/style/css';
 import { useImAccountStore } from "@/stores/imAccountStore";
 import { resetCurrSession, imActiveSessionChange } from "@/utils/nim";
@@ -16,6 +17,21 @@ const checkWindowStatus = async () => {
 const isWindowVisible = ref(false);
 onMounted(async () => {
   if (window.electronAPI) {
+    // 监听更新可用事件
+    window.electronAPI.onUpdateAvailable(() => {
+      ElNotification({
+        title: '更新提示',
+        message: '新版本可用！正在下载...',
+        type: 'info'
+      });
+    });
+    // 监听更新已下载事件
+    window.electronAPI.onUpdateDownloaded(() => {
+      if (confirm('更新已下载，是否立即安装？')) {
+        window.electronAPI.installUpdate();  // 触发安装更新
+      }
+    });
+
     // 监听主窗口显示/隐藏事件
     await checkWindowStatus();
     window.electronAPI.onWindowVisibilityChanged((isVisible) => {
