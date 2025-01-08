@@ -1,5 +1,6 @@
 {
   "name": "electron-app",
+  "productName": "企业火",
   "version": "1.0.0",
   "description": "electron im app",
   "main": "src/main/main.js",

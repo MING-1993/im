@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, session, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, session } = require('electron');
 const path = require('node:path');
 const { autoUpdater } = require('electron-updater');
 require('dotenv').config();
@@ -23,8 +23,14 @@ const createMainWindow = () => {
   });
 
   mainWindow?.on('close', (event) => {
+    console.log('是否阻止', app.isQuitting)
+    if (app.isQuitting) return;
     event.preventDefault(); // 阻止默认行为
     mainWindow?.hide(); // 隐藏窗口
+  });
+
+  mainWindow.on('closed', () => {
+    mainWindow = null; // 销毁主窗口
   });
 
   if (process.env.NODE_ENV === 'development') {
@@ -34,7 +40,7 @@ const createMainWindow = () => {
   }
 
   // 打开开发工具
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 }
 
 // 应用启动逻辑
@@ -49,20 +55,23 @@ app.whenReady().then(() => {
   createMainWindow();
 
   app.on('activate', () => {
-    if (mainWindow) {
-      mainWindow.show(); // 恢复窗口
-    } else {
-      createMainWindow();
+    if (!app.isQuitting) {
+      if (mainWindow) {
+        mainWindow.show(); // 恢复窗口
+      } else {
+        createMainWindow();
+      }
     }
 
   })
 
+  app.on('before-quit', () => {
+    console.log('应用准备退出')
+    app.isQuitting = true; // 设置退出标志
+  });
+
   app.on('window-all-closed', () => {
-    if (process.platform === 'darwin') {
-      // event.preventDefault();
-    } else {
-      app.quit()
-    }
+    app.quit();
   })
 
   // 启动自动更新
@@ -70,6 +79,7 @@ app.whenReady().then(() => {
 
   // 监听更新事件
   autoUpdater.on('update-available', () => {
+    console.log('有新的应用发布需要更新');
     mainWindow.webContents.send('update-available');
   });
   autoUpdater.on('update-downloaded', () => {

@@ -47,6 +47,7 @@ module.exports = {
           owner: 'MING-1993',
           name: 'im',
         },
+        draft: false, // 设置为 true 用于草稿发布
         prerelease: false,  // 设置为 true 用于发布预发行版本
       }
     }
